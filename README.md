@@ -1,2 +1,2 @@
-# directed_study
-Collection of work from Directed Study on deep learning and contact estimation at the University of Michigan (Fall 2020)
+# Directed Study (CURLY Lab @ University of Michigan)
+TBD
