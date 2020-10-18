@@ -1,0 +1,8 @@
+package inekf;
+
+struct imu_t
+{
+    double  lcm_timestamp;
+    double  acc[3];
+    double  omega[3];
+}
