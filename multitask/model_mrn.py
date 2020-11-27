@@ -149,7 +149,6 @@ class MRN(object):
             self.train_cross_loss = 0
             self.train_multi_task_loss = 0
             self.train_total_loss = 0
-        print(self.iter_num)
         self.iter_num += 1
     
     # def test(self, input, i):
