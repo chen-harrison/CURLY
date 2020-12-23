@@ -84,17 +84,12 @@ legend('mocap', 'lcm')
 % contact_data
 contact_t = lcm.contact_data.lcm_timestamp;
 lcm_tau_fb = lcm.contact_data.tau_feed_back;
-[start_idx, end_idx, contact_t, lcm_tau_fb] = crop_data(contact_t, lcm_tau_fb, lcm_start_t, lcm_end_t);
-lcm_tau_ff = lcm.contact_data.tau_feed_forward(start_idx:end_idx, :);
+[~, ~, contact_t, lcm_tau_fb] = crop_data(contact_t, lcm_tau_fb, lcm_start_t, lcm_end_t);
 
 % leg_control_data
 legcontrol_t = lcm.leg_control_data.lcm_timestamp;
 lcm_q = lcm.leg_control_data.q;
-[start_idx, end_idx, legcontrol_t, lcm_q] = crop_data(legcontrol_t, lcm_q, lcm_start_t, lcm_end_t);
-lcm_p = lcm.leg_control_data.p(start_idx:end_idx, :);
-lcm_qd = lcm.leg_control_data.qd(start_idx:end_idx, :);
-lcm_v = lcm.leg_control_data.v(start_idx:end_idx, :);
-lcm_tau_est = lcm.leg_control_data.tau_est(start_idx:end_idx, :);
+[~, ~, legcontrol_t, lcm_q] = crop_data(legcontrol_t, lcm_q, lcm_start_t, lcm_end_t);
 
 % microstrain
 imu_t = lcm.microstrain.lcm_timestamp;
@@ -147,16 +142,28 @@ for i = 1:size(contact_labels, 2)
     
 end
 
-save('sync_data.mat', ...
-     'mocap_t', 'contact_labels', ...
-     'contact_t', 'lcm_tau_fb', 'lcm_tau_ff', ...
-     'legcontrol_t', 'lcm_q', 'lcm_p', 'lcm_qd', 'lcm_v', 'lcm_tau_est', ...
-     'imu_t', 'lcm_acc', 'lcm_gyro')
+% find the highest frequency set of data and make it univ_t
+t_vars = ["mocap_t", "contact_t", "legcontrol_t", "imu_t"];
+t_sizes = [size(mocap_t, 2), size(contact_t, 2), size(legcontrol_t, 2), size(imu_t, 2)];
+[~, max_t_idx] = max(t_sizes);
+% univ_t will be the set of timestamps that we change all inputs to correspond to
+univ_t = eval(t_vars(max_t_idx));
 
-function [start_idx, end_idx, t, x] = crop_data(t_init, x_init, start_t, end_t)
+univ_idx = zeros(size(univ_t, 2), size(t_vars, 2));
+for i = 1:size(t_vars, 2)
+    t_i = eval(t_vars(i));
+    univ_idx(:,i) = knnsearch(t_i', univ_t');
+end
+
+contact_labels = contact_labels(univ_idx(:,1),:);
+inputs = [lcm_tau_fb(univ_idx(:,2),:), lcm_q(univ_idx(:,3),:), ...
+          lcm_acc(univ_idx(:,4),:), lcm_gyro(univ_idx(:,4),:)];
+
+save('cnn_train_data.mat', 'contact_labels', 'inputs')
+
+function [start_idx, end_idx, t, y] = crop_data(t_init, y_init, start_t, end_t)
 start_idx = knnsearch(t_init', start_t);
 end_idx = knnsearch(t_init', end_t);
-x = x_init(start_idx:end_idx, :);
+y = y_init(start_idx:end_idx, :);
 t = t_init(start_idx:end_idx) - t_init(start_idx);
-
 end
