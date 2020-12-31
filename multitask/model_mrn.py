@@ -23,9 +23,11 @@ class MRN(object):
 
         self.device = device
         self.num_tasks = num_tasks
+
         self.train_cross_loss = 0
         self.train_multitask_loss = 0
         self.train_total_loss = 0
+        
         self.print_interval = 50
         self.cov_update_freq = 100
 

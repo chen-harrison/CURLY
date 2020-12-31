@@ -35,6 +35,8 @@ for epoch in range(num_epochs):
             inputs, labels = data
             labels_list = torch.split(labels, 1, dim=1)
             model.optimize(inputs, labels_list)
+    
+    # test set accuracy
 
 
     
