@@ -1,7 +1,7 @@
 %% LOAD DATA
 
 clear all
-mocap_path = '~/Documents/CURLY/mocap_data/08282020_trial1_data.mat';
+mocap_path = '~/Documents/CURLY/raw_data/mocap_data/08282020_trial2_data.mat';
 mocap_struct = who(matfile(mocap_path));
 mocap_struct = mocap_struct{1};
 mocap = load(mocap_path, mocap_struct);
@@ -12,7 +12,7 @@ mocap = mocap.(mocap_struct);
 % leg_control_data.q, leg_control_data.p = joint position, foot position
 % microstrain.acc, microstrain.omega, microstrain.rpy, micrstrain.quat =
 % IMU accelerometer, gyro, orientation
-lcm_path = '~/Documents/CURLY/lcm_data/lcmlog-2020-08-29.00.mat';
+lcm_path = '~/Documents/CURLY/raw_data/lcm_data/lcmlog-2020-08-29.01.mat';
 lcm = load(lcm_path, 'contact_data', 'leg_control_data', 'microstrain');
 
 
@@ -21,8 +21,8 @@ lcm = load(lcm_path, 'contact_data', 'leg_control_data', 'microstrain');
 % indicate indices corresponding to body and leg(s)
 % read mocap.RigidBodies.Name to figure out which is which, and order
 % leg_idx as follows: [right front, left front, right back, left back]
-mocap_body_idx = 2;
-mocap_leg_idx = [3, 6, 5, 4];
+mocap_body_idx = 1;
+mocap_leg_idx = [2, 3, 4, 5];
 
 % build transformation matrix to find leg coordinates relative to body
 p_body = mocap.RigidBodies.Positions(mocap_body_idx, :, :);

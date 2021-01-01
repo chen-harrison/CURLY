@@ -1,9 +1,10 @@
 import lcm
 from inekf import groundtruth_t
 
+# subscribe to ground truth channel to verify it's working
+
 def my_handler(channel, data):
     msg = groundtruth_t.decode(data)
-    print("Received message on channel \"{}\"".format(channel))
     print("timestamp = {}".format(msg.mocap_timestamp))
     print("labels: {}".format(msg.contact))
     print("")

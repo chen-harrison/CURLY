@@ -38,7 +38,7 @@ from inekf import contact_t, groundtruth_t, imu_t, legcontrol_t
 # double  quat[4];
 
 def main():
-    PATH = '/home/harrison/Documents/CURLY/mat2lcm/sync_data.mat'
+    PATH = '/home/harrison/Documents/CURLY/sync/sync_data.mat'
     sync_data = sio.loadmat(PATH)
 
     log = lcm.EventLog('sync_data.log', mode='w', overwrite=True)
