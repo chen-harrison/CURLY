@@ -1,7 +1,7 @@
 %% LOAD DATA
 
 clear all
-mocap_path = '~/Documents/CURLY/mocap_data/08282020_trial1_data.mat';
+mocap_path = '~/Documents/CURLY/raw_data/mocap_data/08282020_trial1_data.mat';
 mocap_struct = who(matfile(mocap_path));
 mocap_struct = mocap_struct{1};
 mocap = load(mocap_path, mocap_struct);
@@ -11,7 +11,7 @@ mocap = mocap.(mocap_struct);
 % contact_data.tau_feed_back = joint tau
 % leg_control_data.q, leg_control_data.p = joint position, foot position
 % microstrain.acc, microstrain.omega = IMU accelerometer, gyro
-lcm_path = '~/Documents/CURLY/lcm_data/lcmlog-2020-08-29.00.mat';
+lcm_path = '~/Documents/CURLY/raw_data/lcm_data/lcmlog-2020-08-29.00.mat';
 lcm = load(lcm_path, 'contact_data', 'leg_control_data', 'microstrain');
 
 
@@ -95,7 +95,7 @@ lcm_q = lcm.leg_control_data.q;
 imu_t = lcm.microstrain.lcm_timestamp;
 lcm_acc = lcm.microstrain.acc;
 [start_idx, end_idx, imu_t, lcm_acc] = crop_data(imu_t, lcm_acc, lcm_start_t, lcm_end_t);
-lcm_gyro = lcm.microstrain.omega(start_idx:end_idx, :);
+lcm_omega = lcm.microstrain.omega(start_idx:end_idx, :);
 
 
 %% IDENTIFY CONTACT INSTANCES
@@ -157,7 +157,7 @@ end
 
 contact_labels = contact_labels(univ_idx(:,1),:);
 inputs = [lcm_tau_fb(univ_idx(:,2),:), lcm_q(univ_idx(:,3),:), ...
-          lcm_acc(univ_idx(:,4),:), lcm_gyro(univ_idx(:,4),:)];
+          lcm_acc(univ_idx(:,4),:), lcm_omega(univ_idx(:,4),:)];
 
 save('cnn_train_data.mat', 'contact_labels', 'inputs')
 

@@ -34,6 +34,8 @@ from inekf import contact_t, groundtruth_t, imu_t, legcontrol_t
 # double  lcm_timestamp;
 # double  acc[3];
 # double  omega[3];
+# double  rpy[3];
+# double  quat[4];
 
 def main():
     PATH = '/home/harrison/Documents/CURLY/mat2lcm/sync_data.mat'
@@ -61,7 +63,9 @@ def main():
 
     i_t = sync_data['imu_t'].flatten().tolist()
     acc = sync_data['lcm_acc'].tolist()
-    gyro = sync_data['lcm_gyro'].tolist()
+    omega = sync_data['lcm_omega'].tolist()
+    rpy = sync_data['lcm_rpy'].tolist()
+    quat = sync_data['lcm_quat'].tolist()
 
     # combine all timestamps, remove duplicates, and sort
     all_t = list(set(m_t + c_t + l_t + i_t))
@@ -117,7 +121,9 @@ def main():
             msg = imu_t()
             msg.lcm_timestamp = i_t[i]
             msg.acc = acc[i]
-            msg.omega = gyro[i]
+            msg.omega = omega[i]
+            msg.rpy = rpy[i]
+            msg.quat = quat[i]
 
             log.write_event(utime + int(10**6 * i_t[i]), 'microstrain', msg.encode())
             i += 1

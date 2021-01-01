@@ -10,7 +10,8 @@ mocap = mocap.(mocap_struct);
 % LCM DATA BEING USED:
 % contact_data.tau_feed_back = joint tau
 % leg_control_data.q, leg_control_data.p = joint position, foot position
-% microstrain.acc, microstrain.omega = IMU accelerometer, gyro
+% microstrain.acc, microstrain.omega, microstrain.rpy, micrstrain.quat =
+% IMU accelerometer, gyro, orientation
 lcm_path = '~/Documents/CURLY/lcm_data/lcmlog-2020-08-29.00.mat';
 lcm = load(lcm_path, 'contact_data', 'leg_control_data', 'microstrain');
 
@@ -100,7 +101,9 @@ lcm_tau_est = lcm.leg_control_data.tau_est(start_idx:end_idx, :);
 imu_t = lcm.microstrain.lcm_timestamp;
 lcm_acc = lcm.microstrain.acc;
 [start_idx, end_idx, imu_t, lcm_acc] = crop_data(imu_t, lcm_acc, lcm_start_t, lcm_end_t);
-lcm_gyro = lcm.microstrain.omega(start_idx:end_idx, :);
+lcm_omega = lcm.microstrain.omega(start_idx:end_idx, :);
+lcm_rpy = lcm.microstrain.rpy(start_idx:end_idx, :);
+lcm_quat = lcm.microstrain.quat(start_idx:end_idx, :);
 
 
 %% IDENTIFY CONTACT INSTANCES
@@ -151,7 +154,7 @@ save('sync_data.mat', ...
      'mocap_t', 'contact_labels', ...
      'contact_t', 'lcm_tau_fb', 'lcm_tau_ff', ...
      'legcontrol_t', 'lcm_q', 'lcm_p', 'lcm_qd', 'lcm_v', 'lcm_tau_est', ...
-     'imu_t', 'lcm_acc', 'lcm_gyro')
+     'imu_t', 'lcm_acc', 'lcm_omega', 'lcm_rpy', 'lcm_quat')
 
 function [start_idx, end_idx, t, x] = crop_data(t_init, x_init, start_t, end_t)
 start_idx = knnsearch(t_init', start_t);

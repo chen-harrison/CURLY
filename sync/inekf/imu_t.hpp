@@ -22,6 +22,10 @@ class imu_t
 
         double     omega[3];
 
+        double     rpy[3];
+
+        double     quat[4];
+
     public:
         /**
          * Encode a message into binary form.
@@ -127,6 +131,12 @@ int imu_t::_encodeNoHash(void *buf, int offset, int maxlen) const
     tlen = __double_encode_array(buf, offset + pos, maxlen - pos, &this->omega[0], 3);
     if(tlen < 0) return tlen; else pos += tlen;
 
+    tlen = __double_encode_array(buf, offset + pos, maxlen - pos, &this->rpy[0], 3);
+    if(tlen < 0) return tlen; else pos += tlen;
+
+    tlen = __double_encode_array(buf, offset + pos, maxlen - pos, &this->quat[0], 4);
+    if(tlen < 0) return tlen; else pos += tlen;
+
     return pos;
 }
 
@@ -143,6 +153,12 @@ int imu_t::_decodeNoHash(const void *buf, int offset, int maxlen)
     tlen = __double_decode_array(buf, offset + pos, maxlen - pos, &this->omega[0], 3);
     if(tlen < 0) return tlen; else pos += tlen;
 
+    tlen = __double_decode_array(buf, offset + pos, maxlen - pos, &this->rpy[0], 3);
+    if(tlen < 0) return tlen; else pos += tlen;
+
+    tlen = __double_decode_array(buf, offset + pos, maxlen - pos, &this->quat[0], 4);
+    if(tlen < 0) return tlen; else pos += tlen;
+
     return pos;
 }
 
@@ -152,12 +168,14 @@ int imu_t::_getEncodedSizeNoHash() const
     enc_size += __double_encoded_array_size(NULL, 1);
     enc_size += __double_encoded_array_size(NULL, 3);
     enc_size += __double_encoded_array_size(NULL, 3);
+    enc_size += __double_encoded_array_size(NULL, 3);
+    enc_size += __double_encoded_array_size(NULL, 4);
     return enc_size;
 }
 
 uint64_t imu_t::_computeHash(const __lcm_hash_ptr *)
 {
-    uint64_t hash = 0x98461110e4c3d321LL;
+    uint64_t hash = 0xa956d0a31a88a79eLL;
     return (hash<<1) + ((hash>>63)&1);
 }
 

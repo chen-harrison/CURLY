@@ -10,16 +10,18 @@ except ImportError:
 import struct
 
 class imu_t(object):
-    __slots__ = ["lcm_timestamp", "acc", "omega"]
+    __slots__ = ["lcm_timestamp", "acc", "omega", "rpy", "quat"]
 
-    __typenames__ = ["double", "double", "double"]
+    __typenames__ = ["double", "double", "double", "double", "double"]
 
-    __dimensions__ = [None, [3], [3]]
+    __dimensions__ = [None, [3], [3], [3], [4]]
 
     def __init__(self):
         self.lcm_timestamp = 0.0
         self.acc = [ 0.0 for dim0 in range(3) ]
         self.omega = [ 0.0 for dim0 in range(3) ]
+        self.rpy = [ 0.0 for dim0 in range(3) ]
+        self.quat = [ 0.0 for dim0 in range(4) ]
 
     def encode(self):
         buf = BytesIO()
@@ -31,6 +33,8 @@ class imu_t(object):
         buf.write(struct.pack(">d", self.lcm_timestamp))
         buf.write(struct.pack('>3d', *self.acc[:3]))
         buf.write(struct.pack('>3d', *self.omega[:3]))
+        buf.write(struct.pack('>3d', *self.rpy[:3]))
+        buf.write(struct.pack('>4d', *self.quat[:4]))
 
     def decode(data):
         if hasattr(data, 'read'):
@@ -47,13 +51,14 @@ class imu_t(object):
         self.lcm_timestamp = struct.unpack(">d", buf.read(8))[0]
         self.acc = struct.unpack('>3d', buf.read(24))
         self.omega = struct.unpack('>3d', buf.read(24))
+        self.rpy = struct.unpack('>3d', buf.read(24))
+        self.quat = struct.unpack('>4d', buf.read(32))
         return self
     _decode_one = staticmethod(_decode_one)
 
-    _hash = None
     def _get_hash_recursive(parents):
         if imu_t in parents: return 0
-        tmphash = (0x98461110e4c3d321) & 0xffffffffffffffff
+        tmphash = (0xa956d0a31a88a79e) & 0xffffffffffffffff
         tmphash  = (((tmphash<<1)&0xffffffffffffffff) + (tmphash>>63)) & 0xffffffffffffffff
         return tmphash
     _get_hash_recursive = staticmethod(_get_hash_recursive)
@@ -64,4 +69,8 @@ class imu_t(object):
             imu_t._packed_fingerprint = struct.pack(">Q", imu_t._get_hash_recursive([]))
         return imu_t._packed_fingerprint
     _get_packed_fingerprint = staticmethod(_get_packed_fingerprint)
+
+    def get_hash(self):
+        """Get the LCM hash of the struct"""
+        return struct.unpack(">Q", imu_t._get_packed_fingerprint())[0]
 
